@@ -5,7 +5,7 @@ Demonstrates basic Spark operations with sample data
 """
 
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import avg, col, count, desc, max, min, when
+from pyspark.sql.functions import col, when
 from pyspark.sql.types import (
     DateType,
     DoubleType,
@@ -18,7 +18,13 @@ from pyspark.sql.types import (
 
 def create_spark_session():
     """Create and configure Spark session with Iceberg support"""
-    spark = SparkSession.builder.appName("PySpark Sample Application").getOrCreate()
+    spark = (
+        SparkSession.builder.appName("PySpark Sample Application")
+        .config("spark.sql.catalog.local", "org.apache.iceberg.spark.SparkCatalog")
+        .config("spark.sql.catalog.local.type", "hadoop")
+        .config("spark.sql.catalog.local.warehouse", "/home/iceberg/warehouse")
+        .getOrCreate()
+    )
 
     spark.sparkContext.setLogLevel("WARN")  # Reduce log verbosity
     return spark
@@ -69,72 +75,21 @@ def analyze_data(df):
     print("PYSPARK SAMPLE DATA ANALYSIS")
     print("=" * 50)
 
-    # 1. Show the data
-    print("\n1. Sample Employee Data:")
-    df.show()
-
-    # 2. Basic statistics
-    print("\n2. Dataset Info:")
-    print(f"Total records: {df.count()}")
-    print(f"Total columns: {len(df.columns)}")
-    df.printSchema()
-
-    # 3. Department analysis
-    print("\n3. Employees by Department:")
-    dept_analysis = (
-        df.groupBy("department")
-        .agg(
-            count("*").alias("employee_count"),
-            avg("salary").alias("avg_salary"),
-            max("salary").alias("max_salary"),
-            min("salary").alias("min_salary"),
-        )
-        .orderBy(desc("employee_count"))
-    )
-
-    dept_analysis.show()
-
-    # 4. Salary analysis
-    print("\n4. Salary Analysis:")
-    salary_stats = df.select(
-        avg("salary").alias("average_salary"),
-        max("salary").alias("highest_salary"),
-        min("salary").alias("lowest_salary"),
-    )
-    salary_stats.show()
-
-    # 5. Experience-based categorization
-    print("\n5. Employees by Experience Level:")
+    # 1. Experience-based categorization
+    print("\n1. Employees by Experience Level:")
     experience_df = df.withColumn(
         "experience_level",
         when(col("experience_years") <= 1, "Junior")
         .when(col("experience_years") <= 3, "Mid-level")
         .otherwise("Senior"),
     )
-
-    experience_analysis = (
-        experience_df.groupBy("experience_level")
-        .agg(count("*").alias("count"), avg("salary").alias("avg_salary"))
-        .orderBy("avg_salary")
-    )
-
-    experience_analysis.show()
-
-    # 6. High earners
-    print("\n6. High Earners (Salary > $70,000):")
-    high_earners = (
-        df.filter(col("salary") > 70000)
-        .select("name", "department", "salary", "experience_years")
-        .orderBy(desc("salary"))
-    )
-
-    high_earners.show()
+    print(experience_df.show(10, False))
 
     return experience_df
 
 
 def save_to_iceberg(spark, df):
-    print("\n7. Saving to Iceberg Table:")
+    print("\n2. Saving to Iceberg Table:")
 
     try:
         # Create database if not exists
@@ -145,7 +100,7 @@ def save_to_iceberg(spark, df):
             "local.sample_db.employees"
         )
 
-        print("✅ Data successfully saved to Iceberg table: local.sample_db.employees")
+        print("✅ Data successfully saved to Iceberg table: sample_db.employees")
 
         # Verify the save
         print("\nReading back from Iceberg table:")
