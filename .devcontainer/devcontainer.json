@@ -1,0 +1,95 @@
+{
+  "name": "Spark Iceberg Development",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "spark-iceberg",
+  "workspaceFolder": "/home/iceberg",
+  
+  // Optional: Configure which container to connect to if different from service name
+  "shutdownAction": "stopCompose",
+  
+  // Install additional features like Node.js
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "18"
+    }
+  },
+  
+  // Post-create commands to install Node.js and set up environment
+  "postCreateCommand": "bash -c 'echo \"Installing Node.js...\" && curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - && sudo apt-get install -y nodejs && echo \"Node.js installed: $(node --version)\" && echo \"NPM installed: $(npm --version)\" && echo \"Checking mounts:\" && ls -la /home/iceberg/ && ls -la /home/iceberg/warehouse/ && ls -la /home/iceberg/notebooks/ && echo \"Python versions:\" && which python && which python3 && /usr/local/bin/python --version || echo \"Python not found at /usr/local/bin/python\"'",
+  
+  // Use the Data Engineering VS Code profile with extensions and settings
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "aaron-bond.better-comments",
+        "charliermarsh.ruff",
+        "davidanson.vscode-markdownlint",
+        "donjayamanne.python-environment-manager",
+        "eamodio.gitlens",
+        "humao.rest-client",
+        "mechatroner.rainbow-csv",
+        "ms-azuretools.vscode-docker",
+        "ms-python.debugpy",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-toolsai.datawrangler",
+        "ms-toolsai.jupyter",
+        "ms-toolsai.jupyter-keymap",
+        "ms-toolsai.jupyter-renderers",
+        "ms-toolsai.vscode-jupyter-cell-tags",
+        "ms-toolsai.vscode-jupyter-slideshow",
+        "ms-vscode-remote.remote-containers",
+        "mtxr.sqltools",
+        "njpwerner.autodocstring",
+        "pkief.material-icon-theme",
+        "randomfractalsinc.duckdb-sql-tools",
+        "streetsidesoftware.code-spell-checker",
+        "tamasfe.even-better-toml",
+        "vscode-icons-team.vscode-icons",
+        "yzhang.markdown-all-in-one"
+      ],
+      "settings": {
+        "python.analysis.autoImportCompletions": true,
+        "python.analysis.fixAll": ["source.unusedImports"],
+        "editor.defaultFormatter": "charliermarsh.ruff",
+        "[python]": {
+          "editor.formatOnType": true,
+          "editor.formatOnSave": true,
+          "editor.codeActionsOnSave": {
+            "source.fixAll": "explicit",
+            "source.organizeImports": "explicit"
+          }
+        },
+        "editor.inlineSuggest.enabled": true,
+        "editor.lineHeight": 17,
+        "breadcrumbs.enabled": false,
+        "notebook.output.scrolling": true,
+        "jupyter.themeMatplotlibPlots": true,
+        "files.exclude": {
+          "**/__pycache__": true,
+          "**/.cache": true,
+          "**/.coverage": true,
+          "**/.coverage.*": true,
+          "**/.hypothesis": true,
+          "**/.mypy_cache": true,
+          "**/.nox": true,
+          "**/.pytest_cache": true,
+          "**/.ruff_cache": true,
+          "**/.tox": true
+        },
+        "workbench.iconTheme": "material-icon-theme",
+        "sqltools.formatLanguages": ["sql"],
+        "[sql]": {
+          "editor.formatOnSave": true,
+          "editor.defaultFormatter": "mtxr.sqltools"
+        },
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "python.pythonPath": "/usr/local/bin/python",
+        "python.defaultInterpreterPath": "/usr/local/bin/python"
+      }
+    }
+  },
+  
+  // Run as non-root user (optional, adjust based on your container setup)
+  "remoteUser": "root"
+}
