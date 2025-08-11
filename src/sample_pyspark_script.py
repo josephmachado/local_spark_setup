@@ -18,22 +18,7 @@ from pyspark.sql.types import (
 
 def create_spark_session():
     """Create and configure Spark session with Iceberg support"""
-    spark = (
-        SparkSession.builder.appName("PySpark Sample Application")
-        .config(
-            "spark.sql.extensions",
-            "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions",
-        )
-        .config(
-            "spark.sql.catalog.spark_catalog",
-            "org.apache.iceberg.spark.SparkSessionCatalog",
-        )
-        .config("spark.sql.catalog.spark_catalog.type", "hive")
-        .config("spark.sql.catalog.local", "org.apache.iceberg.spark.SparkCatalog")
-        .config("spark.sql.catalog.local.type", "hadoop")
-        .config("spark.sql.catalog.local.warehouse", "/home/iceberg/warehouse")
-        .getOrCreate()
-    )
+    spark = SparkSession.builder.appName("PySpark Sample Application").getOrCreate()
 
     spark.sparkContext.setLogLevel("WARN")  # Reduce log verbosity
     return spark
