@@ -142,8 +142,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-    """
-    pyspark.errors.exceptions.base.PySparkRuntimeError: [PYTHON_VERSION_MISMATCH] Python in worker has different version (3, 10) than that in driver 3.9, PySpark cannot run with different minor versions.
-Please check environment variables PYSPARK_PYTHON and PYSPARK_DRIVER_PYTHON are correctly set.
-"""
